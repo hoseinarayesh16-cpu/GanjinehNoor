@@ -35,8 +35,23 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      
+      - name: Validate AndroidManifest
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          path = "app/src/main/AndroidManifest.xml"
+          try:
+              ET.parse(path)
+              print("Manifest XML is valid")
+          except ET.ParseError as e:
+              print("Manifest XML ERROR:", e)
+              raise
+          PY
+
       - name: Build APK
-        run: gradle --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug --stacktrace --info
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
